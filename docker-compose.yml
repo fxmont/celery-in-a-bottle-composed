@@ -1,0 +1,40 @@
+
+version: "3"
+services:
+
+    rabbit:
+        hostname: rabbit
+        image: rabbitmq:latest
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=mypass
+        ports:
+            - "5673:5672"
+
+    redis:
+        image: redis
+
+    worker:
+        image: sf-celery-worker:latest
+        build:
+            context: .
+            dockerfile: docker/Dockerfile.worker
+        volumes:
+            - .:/app
+        depends_on:
+            - rabbit
+            - redis
+        volumes:
+            - ./app:/usr/src/app
+
+    web:
+        image: sf-web:latest
+        build:
+            context: .
+            dockerfile: docker/Dockerfile.web
+        command: python /code/app/server.py
+        ports:
+            - "5005:5000"
+        depends_on:
+            - worker
+            - redis
