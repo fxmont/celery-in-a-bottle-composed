@@ -7,4 +7,4 @@ RUN pip install celery redis
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-CMD ["celery", "worker", "--app", "tasks", "--loglevel=info"]
+CMD ["celery", "--app", "tasks", "worker", "--loglevel=info"]
